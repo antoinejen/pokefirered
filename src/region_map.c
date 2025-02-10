@@ -640,79 +640,79 @@ static const union AnimCmd *const sAnims_SwitchMapCursor[] = {
 static const struct DungeonMapInfo sDungeonInfo[] = {
     {
         .id = MAPSEC_VIRIDIAN_FOREST,
-        .name = sMapsecName_VIRIDIANFOREST,
+        .name = sMapsecName_VIRIDIAN_FOREST,
         .desc = gText_RegionMap_AreaDesc_ViridianForest
     }, {
         .id = MAPSEC_MT_MOON,
-        .name = sMapsecName_MTMOON,
+        .name = sMapsecName_MT__MOON,
         .desc = gText_RegionMap_AreaDesc_MtMoon
     }, {
         .id = MAPSEC_DIGLETTS_CAVE,
-        .name = sMapsecName_DIGLETTSCAVE,
+        .name = sMapsecName_DIGLETT_S_CAVE,
         .desc = gText_RegionMap_AreaDesc_DiglettsCave
     }, {
         .id = MAPSEC_KANTO_VICTORY_ROAD,
-        .name = sMapsecName_VICTORYROAD,
+        .name = sMapsecName_VICTORY_ROAD,
         .desc = gText_RegionMap_AreaDesc_VictoryRoad
     }, {
         .id = MAPSEC_POKEMON_MANSION,
-        .name = sMapsecName_POKMONMANSION,
+        .name = sMapsecName_POK__MON_MANSION,
         .desc = gText_RegionMap_AreaDesc_PokemonMansion
     }, {
         .id = MAPSEC_KANTO_SAFARI_ZONE,
-        .name = sMapsecName_SAFARIZONE,
+        .name = sMapsecName_SAFARI_ZONE,
         .desc = gText_RegionMap_AreaDesc_SafariZone
     }, {
         .id = MAPSEC_ROCK_TUNNEL,
-        .name = sMapsecName_ROCKTUNNEL,
+        .name = sMapsecName_ROCK_TUNNEL,
         .desc = gText_RegionMap_AreaDesc_RockTunnel
     }, {
         .id = MAPSEC_SEAFOAM_ISLANDS,
-        .name = sMapsecName_SEAFOAMISLANDS,
+        .name = sMapsecName_SEAFOAM_ISLANDS,
         .desc = gText_RegionMap_AreaDesc_SeafoamIslands
     }, {
         .id = MAPSEC_POKEMON_TOWER,
-        .name = sMapsecName_POKMONTOWER,
+        .name = sMapsecName_POK__MON_TOWER,
         .desc = gText_RegionMap_AreaDesc_PokemonTower
     }, {
         .id = MAPSEC_CERULEAN_CAVE,
-        .name = sMapsecName_CERULEANCAVE,
+        .name = sMapsecName_CERULEAN_CAVE,
         .desc = gText_RegionMap_AreaDesc_CeruleanCave
     }, {
         .id = MAPSEC_POWER_PLANT,
-        .name = sMapsecName_POWERPLANT,
+        .name = sMapsecName_POWER_PLANT,
         .desc = gText_RegionMap_AreaDesc_PowerPlant
     }, {
         .id = MAPSEC_MT_EMBER,
-        .name = sMapsecName_MTEMBER,
+        .name = sMapsecName_MT__EMBER,
         .desc = gText_RegionMap_AreaDesc_MtEmber
     }, {
         .id = MAPSEC_BERRY_FOREST,
-        .name = sMapsecName_BERRYFOREST,
+        .name = sMapsecName_BERRY_FOREST,
         .desc = gText_RegionMap_AreaDesc_BerryForest
     }, {
         .id = MAPSEC_ICEFALL_CAVE,
-        .name = sMapsecName_ICEFALLCAVE,
+        .name = sMapsecName_ICEFALL_CAVE,
         .desc = gText_RegionMap_AreaDesc_IcefallCave
     }, {
         .id = MAPSEC_LOST_CAVE,
-        .name = sMapsecName_LOSTCAVE,
+        .name = sMapsecName_LOST_CAVE,
         .desc = gText_RegionMap_AreaDesc_LostCave
     }, {
         .id = MAPSEC_TANOBY_CHAMBERS,
-        .name = sMapsecName_TANOBYCHAMBERS,
+        .name = sMapsecName_TANOBY_CHAMBERS,
         .desc = gText_RegionMap_AreaDesc_TanobyRuins
     }, {
         .id = MAPSEC_ALTERING_CAVE,
-        .name = sMapsecName_ALTERINGCAVE,
+        .name = sMapsecName_ALTERING_CAVE,
         .desc = gText_RegionMap_AreaDesc_AlteringCave
     }, {
         .id = MAPSEC_PATTERN_BUSH,
-        .name = sMapsecName_PATTERNBUSH,
+        .name = sMapsecName_PATTERN_BUSH,
         .desc = gText_RegionMap_AreaDesc_PatternBush
     }, {
         .id = MAPSEC_DOTTED_HOLE,
-        .name = sMapsecName_DOTTEDHOLE,
+        .name = sMapsecName_DOTTED_HOLE,
         .desc = gText_RegionMap_AreaDesc_DottedHole
     }
 };
@@ -961,8 +961,8 @@ static void TintMapEdgesPalette(void)
     u16 mapEdgesPal[16];
     CpuCopy16(&sRegionMap_Pal[0x20], mapEdgesPal, sizeof(mapEdgesPal));
     RegionMap_DarkenPalette(mapEdgesPal, NELEMS(mapEdgesPal), 95);
-    LoadPalette(mapEdgesPal, 0x20, sizeof(mapEdgesPal));
-    LoadPalette(&sRegionMap_Pal[0x2F], 0x2F, sizeof(sRegionMap_Pal[0x2F]));
+    LoadPalette(mapEdgesPal, BG_PLTT_ID(2), sizeof(mapEdgesPal));
+    LoadPalette(&sRegionMap_Pal[0x2F], BG_PLTT_ID(2) + 15, PLTT_SIZEOF(1));
 }
 
 static void InitRegionMap(u8 type)
@@ -1105,18 +1105,18 @@ static bool8 LoadRegionMapGfx(void)
     switch (sRegionMap->loadGfxState)
     {
     case 0:
-        LoadPalette(sTopBar_Pal, 0xC0, sizeof(sTopBar_Pal));
+        LoadPalette(sTopBar_Pal, BG_PLTT_ID(12), sizeof(sTopBar_Pal));
         break;
     case 1:
         LoadPalette(sRegionMap_Pal, 0, sizeof(sRegionMap_Pal));
         TintMapEdgesPalette();
         if (sRegionMap->type != REGIONMAP_TYPE_NORMAL)
         {
-            LoadPalette(&sTopBar_Pal[15], 16 * 0, sizeof(sTopBar_Pal[15]));
-            LoadPalette(&sTopBar_Pal[15], 16 * 1, sizeof(sTopBar_Pal[15]));
-            LoadPalette(&sTopBar_Pal[15], 16 * 2, sizeof(sTopBar_Pal[15]));
-            LoadPalette(&sTopBar_Pal[15], 16 * 3, sizeof(sTopBar_Pal[15]));
-            LoadPalette(&sTopBar_Pal[15], 16 * 4, sizeof(sTopBar_Pal[15]));
+            LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(0), sizeof(sTopBar_Pal[15]));
+            LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(1), sizeof(sTopBar_Pal[15]));
+            LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(2), sizeof(sTopBar_Pal[15]));
+            LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(3), sizeof(sTopBar_Pal[15]));
+            LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(4), sizeof(sTopBar_Pal[15]));
         }
         break;
     case 2:
@@ -1972,7 +1972,7 @@ static bool8 LoadMapPreviewGfx(void)
         LoadBgTiles(2, sDungeonMapPreview->tiles, sizeof(sDungeonMapPreview->tiles), 0);
         break;
     case 3:
-        LoadPalette(sDungeonMapPreview->mapPreviewInfo->palptr, 0xD0, 0x60);
+        LoadPalette(sDungeonMapPreview->mapPreviewInfo->palptr, BG_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
         break;
     default:
         return TRUE;
@@ -2073,7 +2073,7 @@ static void Task_DrawDungeonMapPreviewFlavorText(u8 taskId)
             sDungeonMapPreview->blue -= 5;
             CpuCopy16(sDungeonMapPreview->mapPreviewInfo->palptr, sDungeonMapPreview->palette, 0x60);
             TintPalette_CustomTone(sDungeonMapPreview->palette, 48, sDungeonMapPreview->red, sDungeonMapPreview->green, sDungeonMapPreview->blue);
-            LoadPalette(sDungeonMapPreview->palette, 0xD0, sizeof(sDungeonMapPreview->palette));
+            LoadPalette(sDungeonMapPreview->palette, BG_PLTT_ID(13), sizeof(sDungeonMapPreview->palette));
         }
         sDungeonMapPreview->timer++;
         break;
@@ -2416,19 +2416,19 @@ static void Task_MapOpenAnim(u8 taskId)
         sMapOpenCloseAnim->openState++;
         break;
     case 10:
-        LoadPalette(&sTopBar_Pal[15], 16 * 0, sizeof(sTopBar_Pal[15]));
-        LoadPalette(&sTopBar_Pal[15], 16 * 1, sizeof(sTopBar_Pal[15]));
-        LoadPalette(&sTopBar_Pal[15], 16 * 2, sizeof(sTopBar_Pal[15]));
-        LoadPalette(&sTopBar_Pal[15], 16 * 3, sizeof(sTopBar_Pal[15]));
-        LoadPalette(&sTopBar_Pal[15], 16 * 4, sizeof(sTopBar_Pal[15]));
+        LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(0), sizeof(sTopBar_Pal[15]));
+        LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(1), sizeof(sTopBar_Pal[15]));
+        LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(2), sizeof(sTopBar_Pal[15]));
+        LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(3), sizeof(sTopBar_Pal[15]));
+        LoadPalette(&sTopBar_Pal[15], BG_PLTT_ID(4), sizeof(sTopBar_Pal[15]));
         sMapOpenCloseAnim->openState++;
         break;
     case 11:
-        FillBgTilemapBufferRect(1, 0x002, 0, 1, 1, 1, 0x2);
-        FillBgTilemapBufferRect(1, 0x003, 1, 1, 1, 1, 0x2);
-        FillBgTilemapBufferRect(1, 0x03E, 28, 1, 1, 1, 0x2);
-        FillBgTilemapBufferRect(1, 0x03F, 29, 1, 1, 1, 0x2);
-        FillBgTilemapBufferRect(1, 0x03D, 2, 1, 26, 1, 0x2);
+        FillBgTilemapBufferRect(1, 0x002, 0, 1, 1, 1, 2);
+        FillBgTilemapBufferRect(1, 0x003, 1, 1, 1, 1, 2);
+        FillBgTilemapBufferRect(1, 0x03E, 28, 1, 1, 1, 2);
+        FillBgTilemapBufferRect(1, 0x03F, 29, 1, 1, 1, 2);
+        FillBgTilemapBufferRect(1, 0x03D, 2, 1, 26, 1, 2);
         CopyBgTilemapBufferToVram(1);
         m4aSongNumStop(SE_CARD_OPEN);
         PlaySE(SE_ROTATING_GATE);
@@ -2569,7 +2569,7 @@ static void Task_MapCloseAnim(u8 taskId)
         sMapOpenCloseAnim->closeState++;
         break;
     case 2:
-        LoadPalette(sRegionMap_Pal, 0, sizeof(sRegionMap_Pal));
+        LoadPalette(sRegionMap_Pal, BG_PLTT_ID(0), sizeof(sRegionMap_Pal));
         sMapOpenCloseAnim->closeState++;
         break;
     case 3:
@@ -3806,7 +3806,7 @@ u8 *GetMapName(u8 *dst0, u16 mapsec, u16 fill)
     if ((idx = mapsec - MAPSECS_KANTO) <= MAPSEC_SPECIAL_AREA - MAPSECS_KANTO)
     {
         if (IsCeladonDeptStoreMapsec(mapsec) == TRUE)
-            dst = StringCopy(dst0, sMapsecName_CELADONDEPT);
+            dst = StringCopy(dst0, sMapsecName_CELADON_DEPT_);
         else
             dst = StringCopy(dst0, sMapNames[idx]);
     }
