@@ -37,7 +37,7 @@ PowerPlant_EventScript_Zapdos::
 	special QuestLog_CutRecording
 	lock
 	faceplayer
-	setwildbattle SPECIES_ZAPDOS, 50
+	setwildbattle SPECIES_ZAPDOS, 60
 	waitse
 	playmoncry SPECIES_ZAPDOS, CRY_MODE_ENCOUNTER
 	message Text_Gyaoo
@@ -72,7 +72,7 @@ PowerPlant_EventScript_Electrode1::
 	goto_if_questlog EventScript_ReleaseEnd
 	lock
 	faceplayer
-	setwildbattle SPECIES_ELECTRODE, 34
+	setwildbattle SPECIES_ELECTRODE, 40
 	waitse
 	playmoncry SPECIES_ELECTRODE, CRY_MODE_ENCOUNTER
 	delay 40
