@@ -5,14 +5,6 @@
 
 static bool8 IsFlagOrVarStoredInQuestLog(u16 idx, u8 a1);
 
-#define NUM_SPECIAL_FLAGS  (SPECIAL_FLAGS_END - SPECIAL_FLAGS_START + 1)
-#define NUM_TEMP_FLAGS     (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
-#define NUM_TEMP_VARS      (TEMP_VARS_END - TEMP_VARS_START + 1)
-
-#define SPECIAL_FLAGS_SIZE (NUM_SPECIAL_FLAGS / 8)  // 8 flags per byte
-#define TEMP_FLAGS_SIZE    (NUM_TEMP_FLAGS / 8)
-#define TEMP_VARS_SIZE     (NUM_TEMP_VARS * 2)      // 1/2 var per byte
-
 EWRAM_DATA u16 gSpecialVar_0x8000 = 0;
 EWRAM_DATA u16 gSpecialVar_0x8001 = 0;
 EWRAM_DATA u16 gSpecialVar_0x8002 = 0;
@@ -33,23 +25,26 @@ EWRAM_DATA u16 gSpecialVar_MonBoxPos = 0;
 EWRAM_DATA u16 gSpecialVar_TextColor = 0;
 EWRAM_DATA u16 gSpecialVar_PrevTextColor = 0;
 EWRAM_DATA u16 gSpecialVar_0x8014 = 0;
-EWRAM_DATA u8 sSpecialFlags[SPECIAL_FLAGS_SIZE] = {};
+EWRAM_DATA u8 sSpecialFlags[SPECIAL_FLAGS_COUNT] = {};
 
-COMMON_DATA u16 gLastQuestLogStoredFlagOrVarIdx = 0;
+#define NUM_DAILY_FLAGS   (DAILY_FLAGS_END - DAILY_FLAGS_START + 1)
+#define DAILY_FLAGS_SIZE    (NUM_DAILY_FLAGS / 8)
+
+u16 gLastQuestLogStoredFlagOrVarIdx;
 
 extern u16 *const gSpecialVars[];
 
 void InitEventData(void)
 {
-    memset(gSaveBlock1Ptr->flags, 0, sizeof(gSaveBlock1Ptr->flags));
-    memset(gSaveBlock1Ptr->vars, 0, sizeof(gSaveBlock1Ptr->vars));
-    memset(sSpecialFlags, 0, sizeof(sSpecialFlags));
+    memset(gSaveBlock1Ptr->flags, 0, NUM_FLAG_BYTES);
+    memset(gSaveBlock1Ptr->vars, 0, VARS_COUNT * 2);
+    memset(sSpecialFlags, 0, SPECIAL_FLAGS_COUNT);
 }
 
 void ClearTempFieldEventData(void)
 {
-    memset(gSaveBlock1Ptr->flags + (TEMP_FLAGS_START / 8), 0, TEMP_FLAGS_SIZE);
-    memset(gSaveBlock1Ptr->vars + ((TEMP_VARS_START - VARS_START) * 2), 0, TEMP_VARS_SIZE);
+    memset(gSaveBlock1Ptr->flags, 0, 4);
+    memset(gSaveBlock1Ptr->vars, 0, 16 * 2);
     FlagClear(FLAG_SYS_WHITE_FLUTE_ACTIVE);
     FlagClear(FLAG_SYS_BLACK_FLUTE_ACTIVE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
@@ -57,61 +52,63 @@ void ClearTempFieldEventData(void)
     FlagClear(FLAG_SYS_INFORMED_OF_LOCAL_WIRELESS_PLAYER);
 }
 
-// Unused
-static void DisableNationalPokedex_RSE(void)
+void ClearDailyFlags(void)
+{
+    memset(gSaveBlock1Ptr->flags + (DAILY_FLAGS_START / 8), 0, DAILY_FLAGS_SIZE);
+}
+
+void sub_806E168(void)
 {
     u16 *ptr = GetVarPointer(VAR_0x403C);
-    gSaveBlock2Ptr->pokedex.unused = 0;
+    gSaveBlock2Ptr->pokedex.nationalMagic = 0;
     *ptr = 0;
     FlagClear(FLAG_0x838);
 }
 
-// The magic numbers used here (0xDA and 0x0302) correspond to those
-// used in RSE for enabling the national Pokedex
-void EnableNationalPokedex_RSE(void)
+void sub_806E190(void)
 {
-    // Note: the var, struct member, and flag are never used
     u16 *ptr = GetVarPointer(VAR_0x403C);
-    gSaveBlock2Ptr->pokedex.unused = 0xDA;
+    gSaveBlock2Ptr->pokedex.nationalMagic = 0xDA;
     *ptr = 0x0302;
     FlagSet(FLAG_0x838);
 }
 
-// Unused
-static bool32 IsNationalPokedexEnabled_RSE(void)
+bool32 sub_806E1C0(void)
 {
-    if (gSaveBlock2Ptr->pokedex.unused == 0xDA
-            && VarGet(VAR_0x403C) == 0x0302
-            && FlagGet(FLAG_0x838))
-        return TRUE;
-
-    return FALSE;
+    if (gSaveBlock2Ptr->pokedex.nationalMagic != 0xDA)
+        return FALSE;
+    if (VarGet(VAR_0x403C) != 0x0302)
+        return FALSE;
+    if (!FlagGet(FLAG_0x838))
+        return FALSE;
+    return TRUE;
 }
 
-void DisableNationalPokedex(void)
+void sub_806E204(void)
 {
-    u16 *nationalDexVar = GetVarPointer(VAR_NATIONAL_DEX);
-    gSaveBlock2Ptr->pokedex.nationalMagic = 0;
-    *nationalDexVar = 0;
+    u16 *ptr = GetVarPointer(VAR_0x404E);
+    gSaveBlock2Ptr->pokedex.unknown2 = 0;
+    *ptr = 0;
     FlagClear(FLAG_SYS_NATIONAL_DEX);
 }
 
 void EnableNationalPokedex(void)
 {
-    u16 *nationalDexVar = GetVarPointer(VAR_NATIONAL_DEX);
-    gSaveBlock2Ptr->pokedex.nationalMagic = 0xB9;
-    *nationalDexVar = 0x6258;
+    u16 *ptr = GetVarPointer(VAR_0x404E);
+    gSaveBlock2Ptr->pokedex.unknown2 = 0xB9;
+    *ptr = 0x6258;
     FlagSet(FLAG_SYS_NATIONAL_DEX);
 }
 
 bool32 IsNationalPokedexEnabled(void)
 {
-    if (gSaveBlock2Ptr->pokedex.nationalMagic == 0xB9
-            && VarGet(VAR_NATIONAL_DEX) == 0x6258
-            && FlagGet(FLAG_SYS_NATIONAL_DEX))
-        return TRUE;
-
-    return FALSE;
+    if (gSaveBlock2Ptr->pokedex.unknown2 != 0xB9)
+        return FALSE;
+    if (VarGet(VAR_0x404E) != 0x6258)
+        return FALSE;
+    if (!FlagGet(FLAG_SYS_NATIONAL_DEX))
+        return FALSE;
+    return TRUE;
 }
 
 void DisableMysteryGift(void)
@@ -129,36 +126,36 @@ bool32 IsMysteryGiftEnabled(void)
     return FlagGet(FLAG_SYS_MYSTERY_GIFT_ENABLED);
 }
 
-void ClearMysteryGiftFlags(void)
+void ResetMysteryEventFlags(void)
 {
-    FlagClear(FLAG_MYSTERY_GIFT_DONE);
-    FlagClear(FLAG_MYSTERY_GIFT_1);
-    FlagClear(FLAG_MYSTERY_GIFT_2);
-    FlagClear(FLAG_MYSTERY_GIFT_3);
-    FlagClear(FLAG_MYSTERY_GIFT_4);
-    FlagClear(FLAG_MYSTERY_GIFT_5);
-    FlagClear(FLAG_MYSTERY_GIFT_6);
-    FlagClear(FLAG_MYSTERY_GIFT_7);
-    FlagClear(FLAG_MYSTERY_GIFT_8);
-    FlagClear(FLAG_MYSTERY_GIFT_9);
-    FlagClear(FLAG_MYSTERY_GIFT_10);
-    FlagClear(FLAG_MYSTERY_GIFT_11);
-    FlagClear(FLAG_MYSTERY_GIFT_12);
-    FlagClear(FLAG_MYSTERY_GIFT_13);
-    FlagClear(FLAG_MYSTERY_GIFT_14);
-    FlagClear(FLAG_MYSTERY_GIFT_15);
+    FlagClear(FLAG_MYSTERY_EVENT_DONE);
+    FlagClear(FLAG_0x3D9);
+    FlagClear(FLAG_0x3DA);
+    FlagClear(FLAG_0x3DB);
+    FlagClear(FLAG_0x3DC);
+    FlagClear(FLAG_0x3DD);
+    FlagClear(FLAG_0x3DE);
+    FlagClear(FLAG_0x3DF);
+    FlagClear(FLAG_0x3E0);
+    FlagClear(FLAG_0x3E1);
+    FlagClear(FLAG_0x3E2);
+    FlagClear(FLAG_0x3E3);
+    FlagClear(FLAG_0x3E4);
+    FlagClear(FLAG_0x3E5);
+    FlagClear(FLAG_0x3E6);
+    FlagClear(FLAG_0x3E7);
 }
 
-void ClearMysteryGiftVars(void)
+void ResetMysteryEventVars(void)
 {
     VarSet(VAR_EVENT_PICHU_SLOT, 0);
-    VarSet(VAR_MYSTERY_GIFT_1,  0);
-    VarSet(VAR_MYSTERY_GIFT_2,  0);
-    VarSet(VAR_MYSTERY_GIFT_3,  0);
-    VarSet(VAR_MYSTERY_GIFT_4,  0);
-    VarSet(VAR_MYSTERY_GIFT_5,  0);
-    VarSet(VAR_MYSTERY_GIFT_6,  0);
-    VarSet(VAR_MYSTERY_GIFT_7,  0);
+    VarSet(VAR_0x40B6, 0);
+    VarSet(VAR_0x40B7, 0);
+    VarSet(VAR_0x40B8, 0);
+    VarSet(VAR_0x40B9, 0);
+    VarSet(VAR_0x40BA, 0);
+    VarSet(VAR_0x40BB, 0);
+    VarSet(VAR_0x40BC, 0);
     VarSet(VAR_ALTERING_CAVE_WILD_SET, 0);
 }
 
@@ -192,15 +189,15 @@ u16 *GetVarPointer(u16 idx)
     {
         switch (gQuestLogPlaybackState)
         {
-        case QL_PLAYBACK_STATE_STOPPED:
+        case 0:
         default:
             break;
-        case QL_PLAYBACK_STATE_RUNNING:
+        case 1:
             ptr = QuestLogGetFlagOrVarPtr(FALSE, idx);
             if (ptr != NULL)
                 gSaveBlock1Ptr->vars[idx - VARS_START] = *ptr;
             break;
-        case QL_PLAYBACK_STATE_RECORDING:
+        case 2:
             if (IsFlagOrVarStoredInQuestLog(idx - VARS_START, TRUE) == TRUE)
             {
                 gLastQuestLogStoredFlagOrVarIdx = idx - VARS_START;
@@ -263,15 +260,15 @@ u8 *GetFlagAddr(u16 idx)
     {
         switch (gQuestLogPlaybackState)
         {
-        case QL_PLAYBACK_STATE_STOPPED:
+        case 0:
         default:
             break;
-        case QL_PLAYBACK_STATE_RUNNING:
+        case 1:
             ptr = QuestLogGetFlagOrVarPtr(TRUE, idx);
             if (ptr != NULL)
-                gSaveBlock1Ptr->flags[idx / 8] = *ptr;
+                gSaveBlock1Ptr->flags[idx >> 3] = *ptr;
             break;
-        case QL_PLAYBACK_STATE_RECORDING:
+        case 2:
             if (IsFlagOrVarStoredInQuestLog(idx, FALSE) == TRUE)
             {
                 gLastQuestLogStoredFlagOrVarIdx = idx;
