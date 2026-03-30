@@ -2822,7 +2822,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_GamerHugo[] = {
     },
     {
         .iv = 0,
-        .lvl = 24,
+        .lvl = 24à,
         .species = SPECIES_DIGLETT,
     },
 };
@@ -6537,7 +6537,7 @@ static const struct TrainerMonItemCustomMoves sParty_ChampionFirstCharmander[] =
         .lvl = 61,
         .species = SPECIES_GYARADOS,
         .heldItem = ITEM_NONE,
-        .moves = {MOVE_HYDRO_PUMP, MOVE_DRAGON_DANCE, MOVE_CRUNCH, MOVE_THRASH},
+        .moves = {MOVE_HYDRO_PUMP, OVE_DRAGON_DANCE, MOVE_CRUNCH, MOVE_THRASH},
     },
     {
         .iv = 255,
