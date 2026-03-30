@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "task.h"
 #include "overworld.h"
+#include "help_system.h"
 #include "text_window.h"
 #include "strings.h"
 #include "field_fadetransition.h"
@@ -130,7 +131,7 @@ static const struct BgTemplate sOptionMenuBgTemplates[] =
 };
 
 static const u16 sOptionMenuPalette[] = INCBIN_U16("graphics/misc/option_menu.gbapal");
-static const u16 sOptionMenuItemCounts[MENUITEM_COUNT] = {3, 2, 2, 2, 2, 10, 0};
+static const u16 sOptionMenuItemCounts[MENUITEM_COUNT] = {3, 2, 2, 2, 3, 10, 0};
 
 static const u8 *const sOptionMenuItemsNames[MENUITEM_COUNT] =
 {
@@ -170,6 +171,7 @@ static const u8 *const sSoundOptions[] =
 
 static const u8 *const sButtonTypeOptions[] =
 {
+    gText_ButtonTypeHelp,
 	gText_ButtonTypeLR,
 	gText_ButtonTypeLEqualsA
 };
@@ -216,6 +218,7 @@ void CB2_OptionsMenuFromStartMenu(void)
         if (sOptionMenuPtr->option[i] > (sOptionMenuItemCounts[i]) - 1)
             sOptionMenuPtr->option[i] = 0;
     }
+    SetHelpContext(HELPCONTEXT_OPTIONS);
     SetMainCallback2(CB2_OptionMenu);
 }
 

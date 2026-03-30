@@ -4,9 +4,9 @@
 #include "link_rfu.h"
 #include "load_save.h"
 #include "m4a.h"
-#include "rtc.h"
 #include "random.h"
 #include "gba/flash_internal.h"
+#include "help_system.h"
 #include "new_menu_helpers.h"
 #include "overworld.h"
 #include "play_time.h"
@@ -146,7 +146,6 @@ void AgbMain()
     m4aSoundInit();
     EnableVCountIntrAtLine150();
     InitRFU();
-    RtcInit();
     CheckForFlashMemory();
     InitMainCallbacks();
     InitMapMusic();
@@ -156,6 +155,7 @@ void AgbMain()
     SetDefaultFontsPointer();
 
     gSoftResetDisabled = FALSE;
+    gHelpSystemEnabled = FALSE;
 
     SetNotInSaveFailedScreen();
 
@@ -240,7 +240,7 @@ static void InitMainCallbacks(void)
 
 static void CallCallbacks(void)
 {
-    if (!RunSaveFailedScreen())
+    if (!RunSaveFailedScreen() && !RunHelpSystemCallback())
     {
         if (gMain.callback1)
             gMain.callback1();
@@ -485,7 +485,6 @@ void DoSoftReset(void)
     DmaStop(1);
     DmaStop(2);
     DmaStop(3);
-    SiiRtcProtect();
     SoftReset(RESET_ALL & ~RESET_SIO_REGS);
 }
 

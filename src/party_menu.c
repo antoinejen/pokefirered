@@ -20,6 +20,7 @@
 #include "fldeff.h"
 #include "graphics.h"
 #include "help_message.h"
+#include "help_system.h"
 #include "item.h"
 #include "item_menu.h"
 #include "item_use.h"
@@ -580,6 +581,7 @@ static bool8 ShowPartyMenu(void)
         ++gMain.state;
         break;
     case 19:
+        SetHelpContext(HELPCONTEXT_PARTY_MENU);
         ++gMain.state;
         break;
     case 20:
